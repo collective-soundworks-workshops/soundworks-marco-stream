@@ -1,6 +1,7 @@
 import * as soundworks from 'soundworks/client';
 
 const audioContext = soundworks.audioContext;
+const client = soundworks.client;
 
 const template = `
   <canvas class="background"></canvas>
@@ -31,6 +32,9 @@ class PlayerExperience extends soundworks.Experience {
     this.metaAudioStream = undefined;
     this.parallelStreams = [];
 
+    // bind
+    this.dropPacketCallback = this.dropPacketCallback.bind(this);
+    this.latePacketCallback = this.latePacketCallback.bind(this);
   }
 
   start() {
@@ -48,7 +52,7 @@ class PlayerExperience extends soundworks.Experience {
       const surface = new soundworks.TouchSurface(this.view.$el);
       // setup touch listeners
       surface.addListener('touchstart', (id, normX, normY) => {
-        console.log(id, normX, normY);
+        // touch top: one sound, touch down: another (fade between both)
         if( normY >= 0.5 ){ this.setStreamSource('exorcist-theme'); }
         else{ this.setStreamSource('aphex-twin-vordhosbn'); }
       });
@@ -112,6 +116,8 @@ class PlayerExperience extends soundworks.Experience {
       for( let i = 0; i < value - this.parallelStreams.length; i++ ){
         let metaStream = this.getMetaAudioStream();
         metaStream.stream.url = 'sub-loop-test';
+        metaStream.stream.ondrop = this.dropPacketCallback;
+        metaStream.stream.onlate = this.latePacketCallback;
         metaStream.stream.start();
         this.parallelStreams.push( metaStream );
       }
@@ -124,6 +130,14 @@ class PlayerExperience extends soundworks.Experience {
       }
     }
     console.log('num parallel stream: ' + this.parallelStreams.length);
+  }
+
+  dropPacketCallback(){
+    this.send('dropPacket', client.index);
+  }
+
+  latePacketCallback(time){
+    console.log('late packet ' + time);
   }
 
 }

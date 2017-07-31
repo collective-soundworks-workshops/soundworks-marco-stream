@@ -34,6 +34,10 @@ export default class PlayerExperience extends Experience {
     this.playerMap.set(client.index, client);
     // update shared param
     this.params.update('numPlayers', this.playerMap.size);
+    // msg callbacks
+    this.receive(client, 'dropPacket', (clientId) => {
+      console.log('-> client ' + clientId + ' dropped a packet');
+    });
   }
 
   exit(client) {
