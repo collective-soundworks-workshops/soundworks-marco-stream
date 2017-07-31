@@ -20,6 +20,11 @@ process.env.NODE_ENV = config.env;
 // initialize application with configuration options
 soundworks.server.init(config);
 
+// define parameters shared by different clients
+const sharedParams = soundworks.server.require('shared-params');
+sharedParams.addText('numPlayers', 'num players', 0, ['conductor']);
+sharedParams.addNumber('numStreamPerPlayer', 'num stream per player', 0, 100, 1, 0);
+
 // define the configuration object to be passed to the `.ejs` template
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {
   return {
@@ -32,6 +37,9 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
     assetsDomain: config.assetsDomain,
   };
 });
+
+// create server side conductor experience
+const conductor = new soundworks.ControllerExperience('conductor');
 
 // create the experience
 // activities must be mapped to client types:

@@ -25,9 +25,12 @@ class PlayerExperience extends soundworks.Experience {
     this.platform = this.require('platform', { features: ['web-audio'] });
     this.checkin = this.require('checkin', { showDialog: false });
     this.audioStreamManager = this.require('audio-stream-manager', {monitorInterval: 1, requiredAdvanceThreshold: 10});
+    this.params = this.require('shared-params');
 
     // local attr
     this.metaAudioStream = undefined;
+    this.parallelStreams = [];
+
   }
 
   start() {
@@ -48,6 +51,10 @@ class PlayerExperience extends soundworks.Experience {
         console.log(id, normX, normY);
         if( normY >= 0.5 ){ this.setStreamSource('exorcist-theme'); }
         else{ this.setStreamSource('aphex-twin-vordhosbn'); }
+      });
+
+      this.params.addParamListener('numStreamPerPlayer', (value) => {
+        this.setParallelStream(value);
       });
 
     });
@@ -91,11 +98,32 @@ class PlayerExperience extends soundworks.Experience {
     return { 'stream': audioStream, 'gain': gain };
   }
 
-  fadeGainNode( node, initValue, endValue, fadeDuration ){
+  fadeGainNode(node, initValue, endValue, fadeDuration){
     node.gain.value = initValue;
     node.gain.cancelScheduledValues(audioContext.currentTime);
     node.gain.setValueAtTime(node.gain.value, audioContext.currentTime);
     node.gain.linearRampToValueAtTime(endValue, audioContext.currentTime + fadeDuration);
+  }
+
+  setParallelStream(value){
+    // need to add streams
+    if( value > this.parallelStreams.length ){
+      // create new streams and store in local array
+      for( let i = 0; i < value - this.parallelStreams.length; i++ ){
+        let metaStream = this.getMetaAudioStream();
+        metaStream.stream.url = 'sub-loop-test';
+        metaStream.stream.start();
+        this.parallelStreams.push( metaStream );
+      }
+    }
+    // need to remove streams
+    else if( value < this.parallelStreams.length ){
+      for( let i = 0; i < this.parallelStreams.length - value; i++ ){
+        let metaStream = this.parallelStreams.pop();
+        metaStream.stream.stop();
+      }
+    }
+    console.log('num parallel stream: ' + this.parallelStreams.length);
   }
 
 }
