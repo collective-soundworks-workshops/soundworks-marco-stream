@@ -5,9 +5,14 @@ export default class PlayerExperience extends Experience {
   constructor(clientType) {
     super(clientType);
 
+    // services
     this.checkin = this.require('checkin');
     this.sharedConfig = this.require('shared-config');
-    this.audioBufferManager = this.require('audio-buffer-manager');
+    let audioFiles = [
+      './public/streams/aphex-twin-vordhosbn.wav',
+      './public/streams/exorcist-theme.wav',
+    ];
+    this.audioStreamManager = this.require('audio-stream-manager', {audioFiles: audioFiles});    
   }
 
   // if anything needs to append when the experience starts
@@ -19,13 +24,9 @@ export default class PlayerExperience extends Experience {
   // starts the experience on the client side), write it in the `enter` method
   enter(client) {
     super.enter(client);
-    // send a 'hello' message to all the other clients of the same type
-    this.broadcast(client.type, client, 'hello');
   }
 
   exit(client) {
     super.exit(client);
-    // send a 'goodbye' message to all the other clients of the same type
-    this.broadcast(client.type, client, 'goodbye');
   }
 }
