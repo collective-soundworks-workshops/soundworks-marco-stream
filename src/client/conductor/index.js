@@ -18,7 +18,13 @@ function bootstrap() {
   // configure appearance of shared parameters
   let defaultSliderSize = 'medium';
   const conductor = new soundworks.ControllerExperience();
+  conductor.setGuiOptions('start-stop', { type: 'buttons' });
+  conductor.setGuiOptions('cross-fade-duration', {
+    type: 'slider',
+    size: 'large',
+  });
 
+  conductor.setGuiOptions('numStreamPerPlayer', { show: false });
   // start client
   soundworks.client.start();
 }

@@ -23,7 +23,9 @@ soundworks.server.init(config);
 // define parameters shared by different clients
 const sharedParams = soundworks.server.require('shared-params');
 sharedParams.addText('numPlayers', 'num players', 0, ['conductor']);
-sharedParams.addNumber('numStreamPerPlayer', 'num stream per player', 0, 100, 1, 0);
+sharedParams.addEnum('start-stop', 'start / stop', ['start', 'stop'], 'stop');
+sharedParams.addNumber('cross-fade-duration', 'cross-fade duration', 0, 10, 0.01, 1, 's');
+sharedParams.addNumber('numStreamPerPlayer', 'num stream per player', 0, 100, 1, 1);
 
 // define the configuration object to be passed to the `.ejs` template
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {

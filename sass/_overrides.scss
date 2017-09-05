@@ -1,1 +1,26 @@
 // Entry point for application specific styles
+
+#experience {
+  #wrapper {
+    position: absolute;
+
+    .zone {
+      position: absolute;
+      opacity: 0.5;
+
+      &.selected {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+#stream-0 { background-color: red; }
+#stream-1 { background-color: blue; }
+#stream-2 { background-color: green; }
+#stream-3 { background-color: purple; }
+#stream-4 { background-color: grey; }
+#stream-5 { background-color: yellow; }
+#stream-6 { background-color: pink; }
+#stream-7 { background-color: steelblue; }
+#stream-8 { background-color: white; }
