@@ -14,7 +14,8 @@ export default class PlayerExperience extends Experience {
       './public/streams/exorcist-theme.wav',
       './public/streams/sub-loop-test.wav',
     ];
-    this.audioStreamManager = this.require('audio-stream-manager', {audioFiles: audioFiles});    
+    this.audioStreamManager = this.require('audio-stream-manager', {audioFiles: audioFiles});
+    this.sync = this.require('sync');
 
     // local attr
     this.playerMap = new Map();
@@ -22,7 +23,10 @@ export default class PlayerExperience extends Experience {
 
   // if anything needs to append when the experience starts
   start() {
-
+    this.params.addParamListener('startSyncStream', () => {
+      const syncStartOffsetTime = this.sync.getSyncTime();
+      this.broadcast('player', null, 'startSyncStreamFromZero', syncStartOffsetTime);
+    });
   }
 
   // if anything needs to happen when a client enters the performance (*i.e.*

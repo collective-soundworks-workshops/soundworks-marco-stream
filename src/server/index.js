@@ -24,6 +24,7 @@ soundworks.server.init(config);
 const sharedParams = soundworks.server.require('shared-params');
 sharedParams.addText('numPlayers', 'num players', 0, ['conductor']);
 sharedParams.addNumber('numStreamPerPlayer', 'num stream per player', 0, 100, 1, 0);
+sharedParams.addTrigger('startSyncStream', 'startSyncStream');
 
 // define the configuration object to be passed to the `.ejs` template
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {

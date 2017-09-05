@@ -61,6 +61,11 @@ class PlayerExperience extends soundworks.Experience {
         this.setParallelStream(value);
       });
 
+      this.receive('startSyncStreamFromZero', (offsetTime) => {
+        console.log('server defined offset time:', offsetTime);
+        this.startSyncStreamFromZero(offsetTime);
+      });
+
     });
   }
 
@@ -107,6 +112,19 @@ class PlayerExperience extends soundworks.Experience {
     node.gain.cancelScheduledValues(audioContext.currentTime);
     node.gain.setValueAtTime(node.gain.value, audioContext.currentTime);
     node.gain.linearRampToValueAtTime(endValue, audioContext.currentTime + fadeDuration);
+  }
+
+  startSyncStreamFromZero(offsetTime){
+    this.audioStreamManager.syncStartTime = offsetTime;
+    let audioStream = this.audioStreamManager.getAudioStream();
+    // setup audio stream
+    audioStream.loop = true; // disable loop
+    audioStream.sync = true; // disable synchronization
+    audioStream.url = 'aphex-twin-vordhosbn';
+    // connect graph
+    audioStream.connect( audioContext.destination );
+    // start node
+    audioStream.start();
   }
 
   setParallelStream(value){
