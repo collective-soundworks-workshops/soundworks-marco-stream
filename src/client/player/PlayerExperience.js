@@ -5,7 +5,7 @@ const client = soundworks.client;
 
 const template = `
   <div id="wrapper">
-    <% for (let i = 0; i < 9; i++) { %>
+    <% for (var i = 0; i < 9; i++) { %>
       <div class="zone" data-stream="stream-<%= i %>" id="stream-<%= i %>"></div>
     <% } %>
   </div>
@@ -120,7 +120,6 @@ class PlayerExperience extends soundworks.Experience {
     // initialize the view
     this.view = new PlayerView(template, {}, {
       'touchstart .zone': (e) => {
-        console.log('touch !!!!!!!!');
         const streamId = e.target.dataset['stream'];
 
         if (streamId !== this.currentStreamId) {
