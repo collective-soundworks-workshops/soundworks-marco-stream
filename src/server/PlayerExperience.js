@@ -1,15 +1,15 @@
 import { Experience } from 'soundworks/server';
 
 const audioFiles = [
-  './public/streams/stream-0.wav',
-  './public/streams/stream-1.wav',
-  './public/streams/stream-2.wav',
-  './public/streams/stream-3.wav',
-  './public/streams/stream-4.wav',
-  './public/streams/stream-5.wav',
-  './public/streams/stream-6.wav',
-  './public/streams/stream-7.wav',
-  './public/streams/stream-8.wav',
+  './public/streams/test/stream-0.wav',
+  './public/streams/test/stream-1.wav',
+  './public/streams/test/stream-2.wav',
+  './public/streams/test/stream-3.wav',
+  './public/streams/test/stream-4.wav',
+  './public/streams/test/stream-5.wav',
+  './public/streams/test/stream-6.wav',
+  './public/streams/test/stream-7.wav',
+  './public/streams/test/stream-8.wav',
 ];
 
 // server-side 'player' experience.
@@ -19,8 +19,9 @@ export default class PlayerExperience extends Experience {
 
     // services
     this.checkin = this.require('checkin');
+    this.sync = this.require('sync');
     this.sharedConfig = this.require('shared-config');
-    this.params = this.require('shared-params');
+    this.sharedParams = this.require('shared-params');
     this.audioStreamManager = this.require('audio-stream-manager', {
       audioFiles: audioFiles,
     });
@@ -28,9 +29,24 @@ export default class PlayerExperience extends Experience {
     this.syncScheduler = this.require('sync-scheduler');
     // local attr
     this.playerMap = new Map();
+    this.isPlaying = false;
   }
 
-  // start() {}
+  start() {
+    this.sharedParams.addParamListener('start-stop', value => {
+      if (value === 'start') {
+        const syncTime = this.sync.getSyncTime();
+        this.audioStreamManager.syncStartTime = syncTime + 1;
+        this.broadcast('player', null, 'start');
+
+        this.isPlaying = true;
+      } else if (value === 'stop') {
+        this.broadcast('player', null, 'stop');
+
+        this.isPlaying = false;
+      }
+    });
+  }
 
   // if anything needs to happen when a client enters the performance (*i.e.*
   // starts the experience on the client side), write it in the `enter` method
@@ -43,11 +59,14 @@ export default class PlayerExperience extends Experience {
     // register players
     this.playerMap.set(client.index, client);
     // update shared param
-    this.params.update('numPlayers', this.playerMap.size);
+    this.sharedParams.update('numPlayers', this.playerMap.size);
     // msg callbacks
     this.receive(client, 'dropPacket', (clientId) => {
       console.log('-> client ' + clientId + ' dropped a packet');
     });
+
+    if (this.isPlaying)
+      this.send(client, 'start');
   }
 
   exit(client) {
@@ -59,6 +78,6 @@ export default class PlayerExperience extends Experience {
     // unregister player
     this.playerMap.delete(client.index);
     // update shared param
-    this.params.update('numPlayers', this.playerMap.size);
+    this.sharedParams.update('numPlayers', this.playerMap.size);
   }
 }

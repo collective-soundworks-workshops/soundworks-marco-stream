@@ -100,10 +100,11 @@ class PlayerExperience extends soundworks.Experience {
 
     this.params = this.require('shared-params');
     this.syncScheduler = this.require('sync-scheduler');
+    this.sync = this.require('sync');
 
     // local attr
-    this.defaultStream = 'stream-4'; // center of the screen
-    this.currentStream = null;
+    const defaultStream = 'stream-4'; // center of the screen
+    this.currentStream = defaultStream;
     this.metaAudioStream = null;
     this.parallelStreams = [];
     this.crossFadeDuration = null;
@@ -119,6 +120,7 @@ class PlayerExperience extends soundworks.Experience {
     // initialize the view
     this.view = new PlayerView(template, {}, {
       'touchstart .zone': (e) => {
+        console.log('touch !!!!!!!!');
         const streamId = e.target.dataset['stream'];
 
         if (streamId !== this.currentStreamId) {
@@ -130,69 +132,67 @@ class PlayerExperience extends soundworks.Experience {
       id: this.id,
     });
 
+    // this.audioStreamManager.syncStartTime
+    // const startTime = this.sync.getSyncTime() - 0.5;
+    // console.log('syncStartTime', startTime);
+    // this.audioStreamManager.syncStartTime = startTime;
+
+    // const stream = this.audioStreamManager.getAudioStream();
+    // stream.onended = () => console.log('ended!');
+    // stream.connect(audioContext.destination);
+    // stream.url = 'stream-1';
+    // stream.loop = false;
+    // stream.sync = true;
+    // stream.start(0);
+    // return;
+
     // as show can be async, we make sure that the view is actually rendered
     this.show().then(() => {
-      this.params.addParamListener('start-stop', value => {
-        if (value === 'start') {
-          // update view
-          const $zone = this.view.$el.querySelector(`#${this.defaultStream}`);
-          this.view.selectZone($zone);
-          // start at next second
-
-          // @todo - confirm with Jean-Philippe
-          const startTime = Math.ceil(this.syncScheduler.syncTime) + 1;
-          this.audioStreamManager.syncStartTime = startTime;
-          // update stream source
-          this.syncScheduler.defer(() => {
-            this.setStreamSource(this.defaultStream);
-          }, startTime);
-        } else {
-          if (this.metaAudioStream)
-            this.metaAudioStream.stream.stop();
-        }
-      });
-
       this.params.addParamListener('cross-fade-duration', value => {
         this.crossFadeDuration = value;
       });
 
-      // this.params.addParamListener('numStreamPerPlayer', value => {
-      //   console.warn('please use with caution');
-      //   this.setParallelStream(value);
-      // });
+      this.receive('start', () => {
+        this.setStreamSource(this.currentStream);
+
+        const $zone = this.view.$el.querySelector(`#${this.currentStream}`);
+        this.view.selectZone($zone);
+      });
+
+      this.receive('stop', () => {
+        if (this.metaAudioStream)
+          this.metaAudioStream.stream.stop();
+      });
     });
   }
 
   setStreamSource(url, fadeDuration = 1.0) {
-    if (this.metaAudioStream !== null) { // fade out old audio stream
-      const oldMetaStream = this.metaAudioStream;
-      this.fadeGainNode(oldMetaStream.gain, 1, 0, fadeDuration);
+    if (this.metaAudioStream && this.metaAudioStream.stream.url === url)
+      return;
 
-      setTimeout(() => oldMetaStream.stream.stop(), 1000 * fadeDuration);
+    if (this.metaAudioStream !== null) { // fade out old audio stream
+      const { gain, stream } = this.metaAudioStream;
+      this.fadeGainNode(gain, 1, 0, fadeDuration);
+      stream.stop(fadeDuration);
     }
 
-    // get new audio stream
     this.metaAudioStream = this.getMetaAudioStream();
     this.metaAudioStream.stream.url = url;
-    // fade in new audio stream
     this.fadeGainNode(this.metaAudioStream.gain, 0, 1, fadeDuration);
-    // start new audio stream
     this.metaAudioStream.stream.start();
   }
 
   getMetaAudioStream() {
-    // request new audio stream
     const audioStream = this.audioStreamManager.getAudioStream();
-    // setup audio stream
-    audioStream.loop = false; // disable loop
-    audioStream.sync = true; // disable synchronization
-    // audioStream.onended = function(){ console.log('stream ended'); }; // mimics AudioBufferSourceNode onended method
-    // create gain
+    audioStream.loop = false;
+    audioStream.sync = true;
+
     const gain = audioContext.createGain();
-    // connect graph
     audioStream.connect(gain);
     gain.connect(audioContext.destination);
-    // output
+
+    audioStream.onended = () => gain.disconnect();
+
     return { 'stream': audioStream, 'gain': gain };
   }
 
@@ -201,6 +201,14 @@ class PlayerExperience extends soundworks.Experience {
     node.gain.cancelScheduledValues(audioContext.currentTime);
     node.gain.setValueAtTime(node.gain.value, audioContext.currentTime);
     node.gain.linearRampToValueAtTime(endValue, audioContext.currentTime + fadeDuration);
+  }
+
+  dropPacketCallback() {
+    this.send('dropPacket', client.index);
+  }
+
+  latePacketCallback(time) {
+    console.log('late packet ' + time);
   }
 
   // setParallelStream(value) {
@@ -225,14 +233,6 @@ class PlayerExperience extends soundworks.Experience {
 
   //   console.log('num parallel stream: ' + this.parallelStreams.length);
   // }
-
-  dropPacketCallback() {
-    this.send('dropPacket', client.index);
-  }
-
-  latePacketCallback(time) {
-    console.log('late packet ' + time);
-  }
 }
 
 export default PlayerExperience;
