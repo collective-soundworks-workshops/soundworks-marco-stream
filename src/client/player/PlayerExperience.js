@@ -1,7 +1,13 @@
 import * as soundworks from 'soundworks/client';
+import { decibelToLinear } from 'soundworks/utils/math';
+import audioConfig from '../../shared/audio-config';
 
 const audioContext = soundworks.audioContext;
 const client = soundworks.client;
+
+function dbToLin(val) {
+  return Math.exp(0.11512925464970229 * val); // pow(10, val / 20)
+};
 
 const template = `
   <div id="wrapper">
@@ -103,8 +109,8 @@ class PlayerExperience extends soundworks.Experience {
     this.sync = this.require('sync');
 
     // local attr
-    const defaultStream = 'stream-4'; // center of the screen
-    this.currentStream = defaultStream;
+    // const defaultStream = 'stream-4'; // center of the screen
+    this.currentStream = audioConfig.defaultStream;
     this.metaAudioStream = null;
     this.parallelStreams = [];
     this.crossFadeDuration = null;
@@ -131,6 +137,12 @@ class PlayerExperience extends soundworks.Experience {
       id: this.id,
     });
 
+    // master gain
+    this.master = audioContext.createGain();
+    this.master.connect(audioContext.destination);
+    this.master.gain.value = 1;
+    this.master.gain.setValueAtTime(1, audioContext.currentTime);
+
     // this.audioStreamManager.syncStartTime
     // const startTime = this.sync.getSyncTime() - 0.5;
     // console.log('syncStartTime', startTime);
@@ -149,6 +161,12 @@ class PlayerExperience extends soundworks.Experience {
     this.show().then(() => {
       this.params.addParamListener('cross-fade-duration', value => {
         this.crossFadeDuration = value;
+      });
+
+      this.params.addParamListener('master-gain', db => {
+        const gain = decibelToLinear(db);
+        const fadeTime = 0.005;
+        this.master.gain.linearRampToValueAtTime(gain, audioContext.currentTime + fadeTime);
       });
 
       this.receive('start', () => {
@@ -188,7 +206,7 @@ class PlayerExperience extends soundworks.Experience {
 
     const gain = audioContext.createGain();
     audioStream.connect(gain);
-    gain.connect(audioContext.destination);
+    gain.connect(this.master);
 
     audioStream.onended = () => gain.disconnect();
 

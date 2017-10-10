@@ -1,20 +1,8 @@
 import { Experience } from 'soundworks/server';
 
-const audioFiles = [
-  './public/streams/test/stream-0.wav',
-  './public/streams/test/stream-1.wav',
-  './public/streams/test/stream-2.wav',
-  './public/streams/test/stream-3.wav',
-  './public/streams/test/stream-4.wav',
-  './public/streams/test/stream-5.wav',
-  './public/streams/test/stream-6.wav',
-  './public/streams/test/stream-7.wav',
-  './public/streams/test/stream-8.wav',
-];
 
-// server-side 'player' experience.
-export default class PlayerExperience extends Experience {
-  constructor(clientType) {
+class PlayerExperience extends Experience {
+  constructor(clientType, streamFiles) {
     super(clientType);
 
     // services
@@ -23,7 +11,7 @@ export default class PlayerExperience extends Experience {
     this.sharedConfig = this.require('shared-config');
     this.sharedParams = this.require('shared-params');
     this.audioStreamManager = this.require('audio-stream-manager', {
-      audioFiles: audioFiles,
+      audioFiles: streamFiles,
     });
 
     this.syncScheduler = this.require('sync-scheduler');
@@ -48,8 +36,6 @@ export default class PlayerExperience extends Experience {
     });
   }
 
-  // if anything needs to happen when a client enters the performance (*i.e.*
-  // starts the experience on the client side), write it in the `enter` method
   enter(client) {
     super.enter(client);
 
@@ -81,3 +67,5 @@ export default class PlayerExperience extends Experience {
     this.sharedParams.update('numPlayers', this.playerMap.size);
   }
 }
+
+export default PlayerExperience;
