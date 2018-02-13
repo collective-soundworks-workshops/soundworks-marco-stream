@@ -6,18 +6,18 @@
 cd ~/Documents/revelo
 ```
 
-## get updates
-
-```
-git pull origin master
-```
-
 ## convert .aif files in `public/streams_revelo` to .wav
 
 ```
 ./aiff-to-wav.sh
 ```
 
+
+## update project
+
+```
+./update-project.sh
+```
 
 
 ## @todo
