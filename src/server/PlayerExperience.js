@@ -2,8 +2,13 @@ import { Experience } from 'soundworks/server';
 
 
 class PlayerExperience extends Experience {
-  constructor(clientType, streamFiles) {
+  constructor(clientType, streamsConfig) {
     super(clientType);
+
+    const streamFiles = [];
+
+    for (let key in streamsConfig)
+      streamFiles.push(streamsConfig[key]);
 
     // services
     this.checkin = this.require('checkin');

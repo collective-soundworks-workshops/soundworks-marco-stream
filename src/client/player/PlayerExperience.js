@@ -12,7 +12,7 @@ function dbToLin(val) {
 const template = `
   <div id="wrapper">
     <% for (var i = 0; i < 9; i++) { %>
-      <div class="zone" data-stream="stream-<%= i %>" id="stream-<%= i %>"></div>
+      <div class="zone" data-stream="<%= streamIds[i] %>" id="stream-<%= i %>"></div>
     <% } %>
   </div>
 `;
@@ -124,7 +124,9 @@ class PlayerExperience extends soundworks.Experience {
     super.start(); // don't forget this
 
     // initialize the view
-    this.view = new PlayerView(template, {}, {
+    this.view = new PlayerView(template, {
+      streamIds: Object.keys(audioConfig.streams),
+    }, {
       'touchstart .zone': (e) => {
         const streamId = e.target.dataset['stream'];
 

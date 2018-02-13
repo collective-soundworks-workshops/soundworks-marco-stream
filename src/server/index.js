@@ -44,9 +44,9 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
 
 console.log(chalk.green('-----------------------------------------'));
 console.log(chalk.green('Streamed files:'));
-audioConfig.streams.forEach(file => {
-  console.log(chalk.yellow(file));
-});
+for (let key in audioConfig.streams) {
+  console.log(chalk.yellow(audioConfig.streams[key]));
+}
 console.log(chalk.green('-----------------------------------------'));
 
 const conductor = new soundworks.ControllerExperience('conductor');
