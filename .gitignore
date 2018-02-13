@@ -22,3 +22,5 @@ Thumbs.db
 !/public/streams/*.wav
 
 /public/streams_revelo/*
+
+src/shared/audio-config.js
