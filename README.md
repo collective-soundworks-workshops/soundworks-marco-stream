@@ -19,6 +19,12 @@ cd ~/Documents/revelo
 ./update-project.sh
 ```
 
+## launch application
+
+```
+npm run watch
+```
+
 
 ## @todo
 
