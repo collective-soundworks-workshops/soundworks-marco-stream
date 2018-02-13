@@ -20,3 +20,5 @@ Thumbs.db
 # ignore tmp stream folders
 /public/streams/*
 !/public/streams/*.wav
+
+/public/streams_revelo/*
