@@ -10,12 +10,11 @@ const cwd = process.cwd();
 export default {
   // name of the application, used in the `.ejs` template and by default in
   // the `platform` service to populate its view
-  appName: 'MarcoStreamer',
+  appName: 'REVELO',
 
   // name of the environnement ('production' enable cache in express application)
   env: 'development',
 
-  someArray: [0, 1, 2],
   // version of application, can be used to force reload css and js files
   // from server (cf. `html/default.ejs`)
   version: '0.0.1',

@@ -67,6 +67,7 @@ class PlayerView extends soundworks.View {
         $zone.style.height = `${zoneSize}px`;
         $zone.style.top = `${top}px`;
         $zone.style.left = `${left}px`;
+        $zone.style.backgroundImage = `url(../images/tetra-${zoneIndex}.png)`;
       }
     }
 

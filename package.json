@@ -23,7 +23,7 @@
     "babel-runtime": "^6.6.1",
     "chalk": "^2.1.0",
     "debug": "^2.6.4",
-    "soundworks": "github:collective-soundworks/soundworks#v2.1.2",
+    "soundworks": "github:collective-soundworks/soundworks#v2.1.4",
     "source-map-support": "^0.4.0"
   },
   "devDependencies": {

@@ -1,12 +1,18 @@
 // Entry point for application specific styles
 
 #experience {
+  background: url('../images/background.jpg') 50% 50% no-repeat;
+  background-size: cover;
+
   #wrapper {
     position: absolute;
 
     .zone {
       position: absolute;
-      opacity: 0.5;
+      opacity: 0.7;
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      background-size: contain;
 
       &.selected {
         opacity: 1;
@@ -15,12 +21,12 @@
   }
 }
 
-#stream-0 { background-color: red; }
-#stream-1 { background-color: blue; }
-#stream-2 { background-color: green; }
-#stream-3 { background-color: purple; }
-#stream-4 { background-color: grey; }
-#stream-5 { background-color: yellow; }
-#stream-6 { background-color: pink; }
-#stream-7 { background-color: steelblue; }
-#stream-8 { background-color: white; }
+// #stream-0 { background-color: red; }
+// #stream-1 { background-color: blue; }
+// #stream-2 { background-color: green; }
+// #stream-3 { background-color: purple; }
+// #stream-4 { background-color: grey; }
+// #stream-5 { background-color: yellow; }
+// #stream-6 { background-color: pink; }
+// #stream-7 { background-color: steelblue; }
+// #stream-8 { background-color: white; }
