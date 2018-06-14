@@ -196,15 +196,15 @@ class PlayerExperience extends soundworks.Experience {
       stream.stop(fadeDuration);
     }
 
-    this.metaAudioStream = this.getMetaAudioStream();
-    this.metaAudioStream.stream.url = url;
+    this.metaAudioStream = this.getMetaAudioStream(url);
     this.fadeGainNode(this.metaAudioStream.gain, 0, 1, fadeDuration);
     this.metaAudioStream.stream.start();
   }
 
-  getMetaAudioStream() {
+  getMetaAudioStream(url) {
     const audioStream = this.audioStreamManager.getAudioStream();
-    audioStream.loop = false;
+    audioStream.url = url;
+    audioStream.loop = true;
     audioStream.sync = true;
 
     const gain = audioContext.createGain();
